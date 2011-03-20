@@ -1,0 +1,15 @@
+= nanoc_lftp_deployとは
+
+= usage
+
+== 必要なファイルの配置
+
+libディレクトリ以下のファイルを、nanocのプロジェクトディレクトリのlibディレクトリへコピーします。
+
+== config.yaml の編集
+
+== Rakefileの編集
+
+nanocのプロジェクトのRakefileに次のような行を追加します。
+
+

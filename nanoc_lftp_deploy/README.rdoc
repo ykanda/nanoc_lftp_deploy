@@ -1,6 +1,0 @@
-
-= ファイルのコピー
-
-= config.yaml の編集
-
-= Rakefileの編集
