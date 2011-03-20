@@ -1,15 +1,76 @@
+author: Yasuhiro KANDA
+mail: yasuhiro.kanda@gmail.com
+web: http://www.ykanda.net/
+
+
 = nanoc_lftp_deployとは
 
-= usage
+nanocでlftpを使ったファイルのdeployを行うためのヘルパーです。
+nanocの公式サイトではrsyncを使った方法が解説されていますが、よりコンシューマ向けの無料webホスティングなどで使用することを考えて、
+lftpなどでFTPを使う方がやりやすいと思ったため作ってみました。
+
+= nanoc_lftp_deployの使い方
 
 == 必要なファイルの配置
 
-libディレクトリ以下のファイルを、nanocのプロジェクトディレクトリのlibディレクトリへコピーします。
+lib ディレクトリ以下のファイルを、nanoc のプロジェクトディレクトリの lib ディレクトリへコピーします。
 
 == config.yaml の編集
 
+nanoc プロジェクトの config.yaml に次のような内容の記述を追加します
+
+//{
+deploy_lftp:
+  # deploy to staging site
+  default:
+    dst: "{FTPホスト名}:{ディレクトリ名}"
+    user: "{FTP ユーザーID}"
+    pass: "{FTP パスワード}"
+    options: ['']
+  # deploy to public site
+  release:
+    dst: "{FTPホスト名}:{ディレクトリ名}"
+    user: "{FTP ユーザーID}"
+    pass: "{FTP パスワード}"
+    options: ['']
+//}
+
+{ディレクトリ名}の部分は何も記述しなくても構いません。
+そのようにした場合は、大体の場合転送先の最上位のディレクトリを指すと思います。
+
+例えば、ここで「www」と記述したとすると「/www」ディレクトリを基準として、ローカルにあるoutputフォルダの下に含まれる内容が全て転送されます
+この機能は、転送先のルートのさらに下に転送先ディレクトリが設定されている場合を考慮して存在しています。
+
 == Rakefileの編集
 
-nanocのプロジェクトのRakefileに次のような行を追加します。
+nanoc プロジェクトの Rakefile に次のような行を追加します。
 
+//{
+require 'rake/clean'
+require 'nanoc3/tasks'
+require 'lib/nanoc3/tasks'
+//}
 
+== 実行
+
+実行するには、nanocのプロジェクトディレクトリ直下でコマンドラインから次のようにタイプします。
+（「$」はプロンプト記号です）
+上手くいけば、lftp が実行され、output ディレクトリ以下の内容がFTP経由で転送されます。
+
+//{
+$ rake deploy:lftp
+//}
+
+このようにした場合deploy_lftp: default:以下の設定で行われます。
+release: の設定で実行するためには、次のようにタイプします。
+
+//{
+$ rake deploy:lftp config=release
+//}
+
+また、実際にはlftpの処理を行わず、そのコマンドラインだけを標準出力に表示する、dry_runというオプションがあります。
+
+//{
+$ rake deploy:lftp dry_run=true
+$ rake deploy:lftp config=release dry_run=true
+//}
